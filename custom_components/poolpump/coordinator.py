@@ -72,7 +72,7 @@ class PoolPumpCoordinator(DataUpdateCoordinator):
             return {"connected": False, "queue_depth": 0}
 
     async def async_send_command(self, verb: str) -> dict:
-        """POST / with a plain-text verb. Updates coordinator data immediately from the response snapshot."""
+        """POST / with a plain-text verb, then poll until the snapshot changes."""
         async with asyncio.timeout(10):
             resp = await self._session.post(
                 f"{self._host}/",
@@ -85,14 +85,36 @@ class PoolPumpCoordinator(DataUpdateCoordinator):
 
         _LOGGER.debug("poolpump: command %r → resultCode=%s", verb, result.get("resultCode"))
 
-        # The POST response does not include a post-execution snapshot, so we
-        # immediately re-fetch GET / to reflect the new state without waiting
-        # for the next 30-second polling cycle.
-        snapshot = await self._fetch_snapshot()
         current = self.data or {}
+        before = current.get("snapshot") or {}
+
+        # The snapshot embedded in the POST response reflects the state before
+        # Modbus applies the command. Poll GET / until the snapshot diverges
+        # from the pre-command state, so the UI updates as soon as the pump
+        # acknowledges the change (typically within 1–2 seconds).
+        snapshot = await self._poll_until_changed(before)
+
         self.async_set_updated_data({
             "snapshot": snapshot,
             "healthz": current.get("healthz", {}),
         })
 
         return result
+
+    async def _poll_until_changed(
+        self,
+        before: dict,
+        *,
+        attempts: int = 8,
+        interval: float = 0.75,
+    ) -> dict | None:
+        """GET / repeatedly until the snapshot differs from before, or give up."""
+        for i in range(attempts):
+            await asyncio.sleep(interval)
+            snapshot = await self._fetch_snapshot()
+            if snapshot != before:
+                _LOGGER.debug("poolpump: snapshot changed after %ds", int((i + 1) * interval))
+                return snapshot
+            _LOGGER.debug("poolpump: snapshot unchanged, retry %d/%d", i + 1, attempts)
+        _LOGGER.debug("poolpump: snapshot did not change after %ds, using last fetch", int(attempts * interval))
+        return snapshot

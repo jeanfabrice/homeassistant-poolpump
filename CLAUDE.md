@@ -66,7 +66,7 @@ All entities share a single `PoolPumpCoordinator` (a `DataUpdateCoordinator`) cr
 
 The coordinator stores `{"snapshot": dict|None, "healthz": dict}` as its `.data`.
 
-**Command flow:** entity action methods call `coordinator.async_send_command(verb)` which POSTs a plain-text verb to `/`. The POST response does not include a snapshot (`resultCode` is always 0), so the coordinator immediately re-fetches `GET /` and injects the result via `async_set_updated_data()` to refresh the UI without waiting for the next poll.
+**Command flow:** entity action methods call `coordinator.async_send_command(verb)` which POSTs a plain-text verb to `/`. The POST response snapshot reflects the pre-command state (the server responds before Modbus applies the change), so the coordinator polls `GET /` every 750ms (up to 8 attempts) until the snapshot diverges from the pre-command state, then injects it via `async_set_updated_data()`. This ensures the UI reflects the real pump state as soon as it changes (typically within 1–2s) without waiting for the 30s poll.
 
 **`available` contract:** all entities return `False` when `snapshot is None` (server reachable but no Modbus telemetry yet). The climate entity additionally checks `snapshot.get("SWITCHED_ON") is not None` — use `is not None`, not truthiness, because `0` (pump off) is a valid value.
 
@@ -98,7 +98,7 @@ Switching from `OFF` to any active mode sends `on` first, then `setmode X`.
 | Method | Path | Notes |
 |---|---|---|
 | `GET` | `/` | Snapshot JSON; HTTP 500 = no telemetry |
-| `POST` | `/` | Plain-text verb; response `{resultCode, result, ...}` — no snapshot |
+| `POST` | `/` | Plain-text verb; response `{resultCode, result, snapshot}` — snapshot present when `resultCode == 1` |
 | `GET` | `/healthz` | Always 200; `{connected, queue_depth}` |
 
 Valid POST verbs: `on`, `off`, `setmode heat\|auto\|cool`, `mode-boost`, `mode-silent`, `mode-auto`, `set-target N`.
