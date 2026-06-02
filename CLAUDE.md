@@ -95,6 +95,8 @@ Switching from `OFF` to any active mode sends `on` first, then `setmode X`.
 
 ## API reference (poolpump server)
 
+For a deeper understanding of the HTTP API, the Modbus register map, or the command translation logic, read the poolpump server source at https://github.com/thomaswitt/poolpump/tree/main/server — in particular `lib/poolpump/command_translator.rb` (verb parsing, temperature bounds) and `lib/poolpump/register_map.rb` (Modbus register definitions).
+
 | Method | Path | Notes |
 |---|---|---|
 | `GET` | `/` | Snapshot JSON; HTTP 500 = no telemetry |
