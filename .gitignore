@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Éditeurs / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Home Assistant dev local
+config/
+*.log
+
+# Divers
+.env
+dist/
