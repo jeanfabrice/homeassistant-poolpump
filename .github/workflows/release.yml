@@ -43,6 +43,8 @@ jobs:
             echo "manifest.json already up to date"
           else
             git commit -m "[RELEASE] bump manifest version to ${{ steps.version.outputs.version }}"
+            git fetch origin main
+            git rebase origin/main
             git push origin HEAD:main
           fi
 
