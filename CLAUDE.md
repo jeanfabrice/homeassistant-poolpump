@@ -38,16 +38,22 @@ cairosvg.svg2png(url='custom_components/poolpump/images/logo.svg',
 
 ## Releasing
 
-Every release requires:
-1. Bump `"version"` in `custom_components/poolpump/manifest.json`
-2. Commit + push to `main`
-3. Create a git tag (`v0.x.y`) and push it
-4. Create a GitHub release for that tag
+The release workflow is fully automated via `.github/workflows/release.yml`.
 
+**Stable release:**
 ```bash
-git tag v0.x.y && git push origin main && git push origin v0.x.y
-gh release create v0.x.y --title "v0.x.y" --notes "..."
+git tag v0.x.y && git push origin v0.x.y
 ```
+
+**Beta release (not shown by default in HACS):**
+```bash
+git tag v0.x.y-beta1 && git push origin v0.x.y-beta1
+```
+
+The workflow will:
+1. Extract the version from the tag and update `manifest.json` automatically (committed back to `main`)
+2. Create a GitHub release with auto-generated release notes
+3. Mark it as pre-release if the tag contains `-beta`, `-rc`, or `-alpha`
 
 Note: since HA 2026.3, brand images are served from `custom_components/poolpump/brand/` via the local brands API — no need to attach them as release assets.
 
