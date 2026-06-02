@@ -31,7 +31,7 @@ pip install cairosvg
 python3 -c "
 import cairosvg
 cairosvg.svg2png(url='custom_components/poolpump/images/logo.svg',
-                 write_to='custom_components/poolpump/logo.png',
+                 write_to='custom_components/poolpump/brand/logo.png',
                  output_width=256, output_height=256)
 "
 ```
@@ -43,13 +43,13 @@ Every release requires:
 2. Commit + push to `main`
 3. Create a git tag (`v0.x.y`) and push it
 4. Create a GitHub release for that tag
-5. Attach `logo.png` and `icon.png` as release assets (HACS fetches the logo from release assets, not from the repo tree)
 
 ```bash
 git tag v0.x.y && git push origin main && git push origin v0.x.y
 gh release create v0.x.y --title "v0.x.y" --notes "..."
-gh release upload v0.x.y custom_components/poolpump/logo.png custom_components/poolpump/icon.png
 ```
+
+Note: since HA 2026.3, brand images are served from `custom_components/poolpump/brand/` via the local brands API — no need to attach them as release assets.
 
 ## Architecture
 
@@ -60,7 +60,7 @@ All entities share a single `PoolPumpCoordinator` (a `DataUpdateCoordinator`) cr
 
 The coordinator stores `{"snapshot": dict|None, "healthz": dict}` as its `.data`.
 
-**Command flow:** entity action methods call `coordinator.async_send_command(verb)` which POSTs a plain-text verb to `/`. The response includes a post-execution snapshot that is injected immediately via `async_set_updated_data()`, then `async_write_ha_state()` is called to refresh the UI without waiting for the next poll.
+**Command flow:** entity action methods call `coordinator.async_send_command(verb)` which POSTs a plain-text verb to `/`. The POST response does not include a snapshot (`resultCode` is always 0), so the coordinator immediately re-fetches `GET /` and injects the result via `async_set_updated_data()` to refresh the UI without waiting for the next poll.
 
 **`available` contract:** all entities return `False` when `snapshot is None` (server reachable but no Modbus telemetry yet). The climate entity additionally checks `snapshot.get("SWITCHED_ON") is not None` — use `is not None`, not truthiness, because `0` (pump off) is a valid value.
 
@@ -92,7 +92,7 @@ Switching from `OFF` to any active mode sends `on` first, then `setmode X`.
 | Method | Path | Notes |
 |---|---|---|
 | `GET` | `/` | Snapshot JSON; HTTP 500 = no telemetry |
-| `POST` | `/` | Plain-text verb; response includes `{resultCode, snapshot}` |
+| `POST` | `/` | Plain-text verb; response `{resultCode, result, ...}` — no snapshot |
 | `GET` | `/healthz` | Always 200; `{connected, queue_depth}` |
 
 Valid POST verbs: `on`, `off`, `setmode heat\|auto\|cool`, `mode-boost`, `mode-silent`, `mode-auto`, `set-target N`.
