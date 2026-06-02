@@ -1,0 +1,52 @@
+"""Constants for the Pool Pump integration."""
+
+DOMAIN = "poolpump"
+
+CONF_HOST = "host"
+CONF_VERIFY_SSL = "verify_ssl"
+
+SCAN_INTERVAL_SECONDS = 30
+
+# Snapshot keys (GET /)
+KEY_SWITCHED_ON = "SWITCHED_ON"
+KEY_COMPRESSOR_RATE = "COMPRESSOR_RATE"
+KEY_TEMP_AMBIENT = "TEMP_AMBIENT"
+KEY_TEMP_OUTLET = "TEMP_OUTLET"
+KEY_TEMP_INLET = "TEMP_INLET"
+KEY_TEMP_TARGET = "TEMP_TARGET"
+KEY_BOOST = "BOOST"
+KEY_SILENCE = "SILENCE"
+KEY_STATUS_WATERPUMP = "STATUS_WATERPUMP"
+KEY_STATUS_MODE = "STATUS_MODE"
+KEY_STATUS_MALFUNC = "STATUS_MALFUNC"
+KEY_AC_VOLTAGE = "AC_VOLTAGE"
+KEY_MOTOR_CURRENT_A = "MOTOR_CURRENT_A"
+KEY_DC_LINK_VOLTAGE_V = "DC_LINK_VOLTAGE_V"
+KEY_DC_LINK_CURRENT_A = "DC_LINK_CURRENT_A"
+KEY_COMPRESSOR_LOAD_PCT = "COMPRESSOR_LOAD_PCT"
+KEY_MAX_INPUT_W = "MAX_INPUT_W"
+
+# POST commands
+CMD_ON = "on"
+CMD_OFF = "off"
+CMD_MODE_BOOST = "mode-boost"
+CMD_MODE_SILENT = "mode-silent"
+CMD_MODE_AUTO = "mode-auto"
+CMD_SETMODE_HEAT = "setmode heat"
+CMD_SETMODE_COOL = "setmode cool"
+CMD_SETMODE_AUTO = "setmode auto"
+
+# Temperature bounds (validated by the server as well)
+TEMP_MIN = 15
+TEMP_MAX = 32
+TEMP_STEP = 1.0
+
+# Preset mode strings (not HA built-ins — custom to this device)
+PRESET_AUTO = "auto"
+PRESET_BOOST = "boost"
+PRESET_SILENT = "silent"
+
+# STATUS_MODE values → semantic mode names
+STATUS_MODE_HEAT = 1
+STATUS_MODE_AUTO = 2
+STATUS_MODE_COOL = 4
