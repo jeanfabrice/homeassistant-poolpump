@@ -30,7 +30,7 @@ Regenerate `logo.png` / `icon.png` from the source SVG (requires `cairosvg`):
 pip install cairosvg
 python3 -c "
 import cairosvg
-cairosvg.svg2png(url='custom_components/poolpump/images/logo.svg',
+cairosvg.svg2png(url='custom_components/poolpump/brand/logo.svg',
                  write_to='custom_components/poolpump/brand/logo.png',
                  output_width=256, output_height=256)
 "

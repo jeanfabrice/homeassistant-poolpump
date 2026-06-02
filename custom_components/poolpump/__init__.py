@@ -14,8 +14,10 @@ PLATFORMS = ["climate", "sensor", "binary_sensor"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Pool Pump from a config entry."""
-    host = entry.data[CONF_HOST]
-    verify_ssl = entry.data[CONF_VERIFY_SSL]
+    # options supersede data when the user has reconfigured via the options flow.
+    cfg = {**entry.data, **entry.options}
+    host = cfg[CONF_HOST]
+    verify_ssl = cfg[CONF_VERIFY_SSL]
 
     # Dedicated session per config entry so it's closed cleanly on unload.
     session = async_create_clientsession(hass, verify_ssl=verify_ssl)
