@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Home Assistant HACS custom component for the **Acquasource i-Series** pool heat pump. It communicates with the [poolpump server](https://github.com/jeanfabrice/poolpump) — a Ruby/Rack process that bridges HTTP to the pump's Modbus TCP interface — running on the local network (default port 8090).
+A Home Assistant HACS custom component for any pool heat pump supported by the [poolpump server](https://github.com/jeanfabrice/poolpump) — a Ruby/Rack process that bridges HTTP to the pump's Modbus TCP interface — running on the local network (default port 8090).
 
 There are no tests, no build system, and no linter config in this repo. The component is pure Python loaded directly by Home Assistant.
 

@@ -104,8 +104,8 @@ class PoolPumpClimate(CoordinatorEntity[PoolPumpCoordinator], ClimateEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name="Pool Pump",
-            manufacturer="Acquasource",
-            model="i-Series",
+            manufacturer="poolpump",
+            model="Pool Heat Pump",
         )
 
     @property

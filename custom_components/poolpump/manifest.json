@@ -1,6 +1,6 @@
 {
   "domain": "poolpump",
-  "name": "Pool Pump (Acquasource i-Series)",
+  "name": "Pool Pump",
   "codeowners": ["@jeanfabrice"],
   "config_flow": true,
   "documentation": "https://github.com/jeanfabrice/homeassistant-poolpump",
