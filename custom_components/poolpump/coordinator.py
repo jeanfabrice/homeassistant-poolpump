@@ -85,14 +85,14 @@ class PoolPumpCoordinator(DataUpdateCoordinator):
 
         _LOGGER.debug("poolpump: command %r → resultCode=%s", verb, result.get("resultCode"))
 
-        # The POST response embeds the post-execution snapshot — inject it
-        # immediately so the HA UI reflects the new state without waiting for
-        # the next 30-second polling cycle.
-        if result.get("resultCode") == 1 and "snapshot" in result:
-            current = self.data or {}
-            self.async_set_updated_data({
-                "snapshot": result["snapshot"],
-                "healthz": current.get("healthz", {}),
-            })
+        # The POST response does not include a post-execution snapshot, so we
+        # immediately re-fetch GET / to reflect the new state without waiting
+        # for the next 30-second polling cycle.
+        snapshot = await self._fetch_snapshot()
+        current = self.data or {}
+        self.async_set_updated_data({
+            "snapshot": snapshot,
+            "healthz": current.get("healthz", {}),
+        })
 
         return result
